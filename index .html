@@ -1,0 +1,988 @@
+<title>헬스케어파트 컨트롤룸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Gothic+A1:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --paper-2:#F7F9F8;
+    --ink:#181A19;
+    --ink-soft:#565B58;
+    --muted:#8B9089;
+    --line:rgba(24,26,25,0.11);
+    --card:#FFFFFF;
+    --blue:#4E93BE;
+    --blue-ink:#0E3A52;
+    --blue-tint:#E4F0F6;
+    --blue-light:#8FC1DD;
+    --green:#7CA986;
+    --green-ink:#1F3324;
+    --green-tint:#E7F1E9;
+    --green-light:#B7D6BD;
+    --neutral:#C7C2B4;
+    --neutral-dark:#9B9587;
+    --good:#4E93BE;
+    --warn:#7CA986;
+    --crit:#B7AE9C;
+    --spot-a:#4E93BE;
+    --spot-b:#7CA986;
+    --shadow: 0 1px 0 rgba(24,26,25,0.03);
+    --radius-lg:26px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#131615;
+      --paper-2:#1A1E1C;
+      --ink:#F2F4F2;
+      --ink-soft:#C6CBC6;
+      --muted:#8E9490;
+      --line:rgba(242,244,242,0.12);
+      --card:#1D2120;
+      --blue:#7FBBDD;
+      --blue-ink:#DCEEF7;
+      --blue-tint:#1E3542;
+      --blue-light:#4E93BE;
+      --green:#9AC5A2;
+      --green-ink:#E4F1E6;
+      --green-tint:#20302A;
+      --green-light:#5E8C68;
+      --neutral:#4A4842;
+      --neutral-dark:#6E695D;
+      --good:#7FBBDD;
+      --warn:#9AC5A2;
+      --crit:#8C8778;
+      --spot-a:#7FBBDD;
+      --spot-b:#9AC5A2;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131615;
+    --paper-2:#1A1E1C;
+    --ink:#F2F4F2;
+    --ink-soft:#C6CBC6;
+    --muted:#8E9490;
+    --line:rgba(242,244,242,0.12);
+    --card:#1D2120;
+    --blue:#7FBBDD;
+    --blue-ink:#DCEEF7;
+    --blue-tint:#1E3542;
+    --blue-light:#4E93BE;
+    --green:#9AC5A2;
+    --green-ink:#E4F1E6;
+    --green-tint:#20302A;
+    --green-light:#5E8C68;
+    --neutral:#4A4842;
+    --neutral-dark:#6E695D;
+    --good:#7FBBDD;
+    --warn:#9AC5A2;
+    --crit:#8C8778;
+    --spot-a:#7FBBDD;
+    --spot-b:#9AC5A2;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Gothic A1","Bricolage Grotesque",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{ font-family:"Bricolage Grotesque","Gothic A1",system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  h1,h2,h3{ font-family:"Bricolage Grotesque","Gothic A1",system-ui,sans-serif; text-wrap:balance; margin:0; }
+
+  .shell{ max-width:1180px; margin:0 auto; padding:20px 20px 80px; }
+
+  /* Top bar */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:10px 4px 22px; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:34px; height:34px; border-radius:9px; background:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-family:"Bricolage Grotesque"; font-size:16px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);}
+  .brand .name{ font-weight:800; font-size:16px; letter-spacing:-0.01em; }
+  .brand .sub{ font-size:12px; color:var(--muted); font-weight:500; }
+
+  .tabswitch{ display:inline-flex; padding:4px; gap:4px; background:var(--paper-2); border-radius:999px; border:1px solid var(--line); }
+  .tabswitch button{ appearance:none; border:none; background:transparent; color:var(--ink-soft); font-family:inherit; font-weight:700; font-size:13.5px; padding:9px 18px; border-radius:999px; cursor:pointer; transition:background .15s ease, color .15s ease; white-space:nowrap; }
+  @media (max-width:520px){ .tabswitch button{ font-size:11.5px; padding:8px 11px; } .brand .sub{ display:none; } }
+  .tabswitch button.active{ background:var(--ink); color:var(--paper); }
+  .tabswitch button:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+  .yearbadge{ font-size:12px; font-weight:800; padding:6px 12px; border-radius:999px; background:var(--blue-tint); color:var(--blue-ink); border:1px solid var(--line); }
+
+  .view{ display:none; }
+  .view.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  @media (prefers-reduced-motion: reduce){ .view.active{ animation:none; } }
+
+  section.block{ margin-bottom:34px; }
+  .block-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .block-head h2{ font-size:19px; font-weight:800; letter-spacing:-0.01em; }
+  .block-head .desc{ font-size:12.5px; color:var(--muted); font-weight:500; }
+
+  /* Mosaic stat cards */
+  .mosaic{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media (max-width:820px){ .mosaic{ grid-template-columns:repeat(2,1fr); } }
+  .tile{ border-radius:var(--radius-lg); padding:20px; position:relative; overflow:hidden; min-height:118px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow); }
+  .tile .tlabel{ font-size:12px; font-weight:700; letter-spacing:0.01em; opacity:0.82; }
+  .tile .tval{ font-size:32px; font-weight:800; letter-spacing:-0.02em; line-height:1; }
+  .tile .tfoot{ font-size:11.5px; font-weight:600; opacity:0.75; }
+  .tile{ background:var(--card); color:var(--ink); border:1px solid var(--line); }
+  .tile.blue,.tile.green{ border-top:3px solid transparent; }
+  .tile.blue{ border-top-color:var(--blue); background:var(--blue-tint); }
+  .tile.green{ border-top-color:var(--green); background:var(--green-tint); }
+  .tile .ticon{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04); }
+  .tile.blue .ticon,.tile.green .ticon,.tile.neutral .ticon{ background:var(--card); color:var(--ink-soft); }
+  .tile .tlabel{ color:var(--ink-soft); }
+  .tile .tfoot{ color:var(--muted); }
+
+  /* Cards / tables */
+  .card-surface{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); }
+
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .search{ flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:9px 14px; }
+  .search input{ border:none; outline:none; background:transparent; font-family:inherit; font-size:13.5px; color:var(--ink); width:100%; }
+  .search svg{ flex:none; opacity:0.5; }
+  .filterpills{ display:flex; gap:6px; flex-wrap:wrap; }
+  .fpill{ appearance:none; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font-family:inherit; font-weight:700; font-size:12.5px; padding:7px 13px; border-radius:999px; cursor:pointer; }
+  .fpill.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  .roster{ display:flex; flex-direction:column; gap:8px; }
+  .prow{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm); overflow:hidden; }
+  .prow-head{ display:grid; grid-template-columns:28px 1.3fr 1fr 1.4fr 0.9fr 20px; gap:12px; align-items:center; padding:13px 16px; cursor:pointer; }
+  @media (max-width:760px){ .prow-head{ grid-template-columns:24px 1fr 20px; } .prow-head .col-ldap,.prow-head .col-disability,.prow-head .col-join{ display:none; } }
+  .avatar{ width:28px; height:28px; border-radius:50%; background:var(--blue-tint); color:var(--blue-ink); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; }
+  .pname{ font-weight:800; font-size:14.5px; }
+  .pldap{ font-size:12px; color:var(--muted); font-family:"Bricolage Grotesque"; }
+  .badge{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; background:var(--paper-2); color:var(--ink-soft); border:1px solid var(--line); white-space:nowrap; }
+  .badge.spot{ background:var(--green-tint); color:var(--green-ink); border-color:transparent; }
+  .pjoin{ font-size:12px; color:var(--muted); }
+  .chev{ transition:transform .18s ease; color:var(--muted); }
+  .prow.open .chev{ transform:rotate(180deg); }
+  .prow-body{ display:none; padding:0 16px 18px; border-top:1px solid var(--line); }
+  .prow.open .prow-body{ display:block; }
+  .pbody-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:18px; padding-top:16px; }
+  @media (max-width:760px){ .pbody-grid{ grid-template-columns:1fr; } }
+  .pbody-card{ background:var(--paper-2); border-radius:var(--radius-sm); padding:14px 16px; }
+  .pbody-card h4{ margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:800; }
+  .schedule-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .schedule-table th{ text-align:left; font-weight:700; color:var(--muted); font-size:11px; padding:5px 6px; border-bottom:1px solid var(--line); }
+  .schedule-table td{ padding:6px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
+  .schedule-note{ font-size:11.5px; color:var(--muted); margin-top:8px; line-height:1.5; }
+  .kv{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); font-size:12.5px; }
+  .kv:last-child{ border-bottom:none; }
+  .kv .k{ color:var(--muted); font-weight:600; }
+  .kv .v{ font-weight:700; text-align:right; }
+  .timeline{ display:flex; flex-direction:column; gap:8px; }
+  .tl-item{ display:flex; gap:10px; align-items:flex-start; font-size:12.5px; }
+  .tl-dot{ width:8px; height:8px; border-radius:50%; margin-top:4px; flex:none; }
+  .tl-dot.done{ background:var(--good); }
+  .tl-dot.pending{ background:var(--warn); }
+  .tl-main{ font-weight:700; }
+  .tl-sub{ color:var(--muted); font-size:11.5px; }
+
+  /* Tab2 */
+  .kpirow{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media (max-width:820px){ .kpirow{ grid-template-columns:repeat(2,1fr); } }
+  .kpi{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); padding:16px 18px; }
+  .kpi .klabel{ font-size:12px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .kpi .kval{ font-size:26px; font-weight:800; letter-spacing:-0.02em; }
+  .kpi .kval small{ font-size:14px; font-weight:700; color:var(--muted); margin-left:2px;}
+  .kpi .ktrend{ font-size:11.5px; font-weight:700; margin-top:4px; }
+  .ktrend.up{ color:var(--good); } .ktrend.down{ color:var(--crit); } .ktrend.flat{ color:var(--muted); }
+
+  .spotpills{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .spotpill{ appearance:none; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--ink); font-family:inherit; font-weight:800; font-size:13px; padding:10px 16px; border-radius:999px; display:flex; align-items:center; gap:8px; }
+  .spotpill .dot{ width:9px; height:9px; border-radius:50%; }
+  .spotpill.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .spotpill .count{ font-size:11px; font-weight:700; opacity:0.65; }
+
+  .chart-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); padding:18px 20px 10px; }
+  .chart-card h3{ font-size:14px; font-weight:800; margin-bottom:2px; }
+  .chart-card .sub{ font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; font-weight:700; color:var(--ink-soft); margin-bottom:8px; }
+  .legend .li{ display:flex; align-items:center; gap:6px; }
+  .legend .sw{ width:10px; height:10px; border-radius:3px; }
+
+  .donut-wrap{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; padding:6px 0 14px; }
+  .donut-wrap svg{ flex:none; }
+  .donut-legend{ flex:1; min-width:200px; display:flex; flex-direction:column; gap:2px; }
+  .donut-row{ display:grid; grid-template-columns:10px 1fr auto auto; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px solid var(--line); font-size:13px; }
+  .donut-row:last-child{ border-bottom:none; }
+  .dsw{ width:10px; height:10px; border-radius:50%; }
+  .dlabel{ font-weight:700; }
+  .dpct{ font-weight:800; min-width:38px; text-align:right; }
+  .dcount{ color:var(--muted); font-size:12px; min-width:44px; text-align:right; }
+  .barsvg{ width:100%; height:auto; display:block; overflow:visible; }
+  .barsvg .axislabel{ font-size:10px; font-weight:600; fill:var(--muted); font-family:"Gothic A1",sans-serif; }
+  .barsvg .trendtotal{ font-size:10px; font-weight:700; fill:var(--ink-soft); font-family:"Gothic A1",sans-serif; }
+  .barsvg .grid{ stroke:var(--line); stroke-width:1; }
+  .barsvg rect.seg{ cursor:default; }
+  .barsvg rect.seg:hover{ filter:brightness(1.08); }
+  .barsvg rect.seghit{ cursor:pointer; fill:transparent; transition:fill .1s ease; }
+  .barsvg rect.seghit:hover{ fill:color-mix(in srgb, var(--ink) 10%, transparent); }
+  .trendhint{ font-size:11px; color:var(--muted); font-weight:600; margin-top:8px; }
+  .negpanel{ margin-top:16px; padding-top:16px; border-top:1px dashed var(--line); }
+  .negpanel[hidden]{ display:none; }
+  .negpanel-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .negpanel-title{ font-size:13px; font-weight:800; }
+  .negpanel-count{ color:var(--muted); font-weight:700; margin-left:4px; }
+  .negpanel-close{ appearance:none; border:1px solid var(--line); background:var(--paper-2); color:var(--ink-soft); font-family:inherit; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:999px; cursor:pointer; flex:none; }
+  .negpanel-body{ display:flex; flex-direction:column; gap:10px; max-height:380px; overflow-y:auto; padding-right:4px; }
+  .negitem{ background:var(--paper-2); border-radius:var(--radius-sm); padding:12px 14px; }
+  .negitem-head{ display:flex; justify-content:space-between; gap:10px; margin-bottom:6px; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .negitem-date{ color:var(--muted); font-weight:600; }
+  .negitem-text{ font-size:12.5px; line-height:1.65; color:var(--ink); }
+
+  .tooltip{ position:fixed; pointer-events:none; background:var(--ink); color:var(--paper); font-size:11.5px; font-weight:600; padding:7px 10px; border-radius:8px; z-index:50; opacity:0; transform:translateY(4px); transition:opacity .1s ease; line-height:1.5; white-space:nowrap; }
+  .tooltip.show{ opacity:1; }
+
+  table.datatable{ width:100%; min-width:560px; border-collapse:collapse; font-size:13px; }
+  table.datatable th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); font-weight:800; padding:8px 10px; border-bottom:1px solid var(--line); }
+  table.datatable td{ padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  table.datatable tr:last-child td{ border-bottom:none; }
+  .ratiobar{ width:70px; height:6px; border-radius:4px; background:var(--paper-2); overflow:hidden; display:inline-block; vertical-align:middle; margin-right:8px; }
+  .ratiobar > span{ display:block; height:100%; background:var(--good); }
+  .spark{ display:flex; align-items:flex-end; gap:2px; height:24px; }
+  .spark i{ display:block; width:5px; background:var(--blue); border-radius:1.5px 1.5px 0 0; opacity:0.85; }
+
+  .emptystate{ text-align:center; padding:50px 20px; color:var(--muted); }
+  .emptystate .glyph{ font-size:30px; margin-bottom:10px; }
+  .emptystate h3{ color:var(--ink); font-size:16px; margin-bottom:6px; }
+  .emptystate p{ font-size:12.5px; margin:0; }
+
+  .callout{ display:flex; gap:10px; align-items:flex-start; background:var(--green-tint); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; color:var(--ink-soft); margin-top:14px; line-height:1.6; }
+  .callout b{ color:var(--ink); }
+
+  footer.foot{ text-align:center; color:var(--muted); font-size:11.5px; padding:30px 0 10px; }
+
+  a{ color:inherit; }
+  ::selection{ background:var(--blue-light); color:var(--blue-ink); }
+
+  .sidefab{ position:fixed; top:50%; right:18px; transform:translateY(-50%); display:flex; flex-direction:column; gap:10px; z-index:40; }
+  .fabbtn{ width:44px; height:44px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; box-shadow:0 4px 14px rgba(24,26,25,0.12); transition:transform .15s ease, background .15s ease; padding:0; font-family:inherit; }
+  .fabbtn:hover{ background:var(--paper-2); transform:scale(1.07); }
+  .fabbtn:active{ transform:scale(0.92); }
+  .fabbtn.spin{ animation:fabspin .5s ease; }
+  @keyframes fabspin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  @media (max-width:820px){ .sidefab{ right:10px; top:auto; bottom:20px; transform:none; flex-direction:column; } .fabbtn{ width:40px; height:40px; font-size:16px; } }
+  @media (prefers-reduced-motion: reduce){ .fabbtn.spin{ animation:none; } }
+</style>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">H</div>
+      <div>
+        <div class="name">헬스케어파트 컨트롤룸</div>
+        <div class="sub">인적사항·서비스 &amp; 모니터링 취합</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="yearbadge">2026</span>
+      <div class="tabswitch" role="tablist">
+        <button id="tabbtn-people" class="active" role="tab" aria-selected="true">인적사항 및 서비스</button>
+        <button id="tabbtn-monitor" role="tab" aria-selected="false">모니터링 취합</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-people" class="view active"></div>
+  <div id="view-monitor" class="view"></div>
+
+  <footer class="foot">링키지랩 헬스케어파트 · 데이터 기준 <span id="dataRangeNote">2026.01–2026.08</span> · 원본 스프레드시트 자동 취합<br><span id="lastUpdatedNote"></span></footer>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<div class="sidefab">
+  <button class="fabbtn" id="themeToggleBtn" type="button" title="라이트/다크 모드 전환" aria-label="테마 전환">🌙</button>
+  <button class="fabbtn" id="refreshBtn" type="button" title="최신 게시본으로 새로고침 · 원본 시트 변경사항은 요청 시 다시 취합해 반영해드려요" aria-label="새로고침">⟳</button>
+</div>
+
+<script id="personnel-data" type="application/json">
+{
+  "people": [
+    {"name":"조나단","ldap":"jonadan.0703","spot":"카카오(판교)","joinDate":"2016-04-27","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"개인 폰 사용","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"사용","period":"2020.01.02~01.16"},"y6":{"status":"사용","period":"2023.01.05~2023.01.19"},"y9":{"status":"2025년 생성","plan":"2026.01.12~2026.01.26"}}},
+    {"name":"안토니오","ldap":"antonio.72","spot":"카카오(판교)","joinDate":"2017-05-12","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"개인 폰 사용","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"사용","period":"2021.04.19~04.28"},"y6":{"status":"사용","period":"2024.04.16~2024.04.30"},"y9":{"status":"2026.05.12부터 발생 예정","plan":""}}},
+    {"name":"한스","ldap":"hans.k","spot":"페이","joinDate":"2018-06-25","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"전맹","support":{"workMethod":"센스원 활용","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"노트북","commute":"지하철","yearEndTax":"지원 불필요"},"sabbatical":{"y3":{"status":"사용","period":"2022.05.18~05.27"},"y6":{"status":"2024년 생성","period":"2025.03.17~2025.03.31"},"y9":{"status":"2027년 생성 예정","plan":""}}},
+    {"name":"앨빈","ldap":"alvin.s","spot":"게임즈","joinDate":"2018-06-25","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"개인 폰 사용","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"사용","period":"2022.05.02~05.11"},"y6":{"status":"2024년 생성","period":"2024.12.17~2024.12.31"},"y9":{"status":"2027년 생성 예정","plan":""}}},
+    {"name":"아서","ldap":"arthur.h","spot":"모빌리티","joinDate":"2018-06-25","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"룸 태블릿PC","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"사용","period":"2022.05.11~05.25"},"y6":{"status":"2024년 생성","period":"2025.04.18~2025.05.02"},"y9":{"status":"2027년 생성 예정","plan":""}}},
+    {"name":"루카스","ldap":"lucas.m","spot":"카카오(판교)","joinDate":"2018-07-02","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"전맹","note":"안내견 맑음","support":{"workMethod":"구두 지원","braille":"","flex":"지원 필요","flexNote":"지원 필요","reservation":"아서 구두지원","reservationNote":"아서 구두지원","commute":"지하철 (안내견)","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"사용","period":"-"},"y6":{"status":"2024년 생성","period":"2024.11.04~2024.11.18"},"y9":{"status":"2027년 생성 예정","plan":""}}},
+    {"name":"실버","ldap":"silver.5311","spot":"페이","joinDate":"2023-11-10","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"개인 태블릿PC","reservation":"가능","reservationNote":"개인 태블릿PC","commute":"지하철 (근로지원인)","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"2026.11.09부터 발생 예정","period":""}}},
+    {"name":"신시아","ldap":"cynthia.1225","spot":"카카오(판교)","joinDate":"2024-05-09","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"전맹","support":{"workMethod":"보이스 오버 확인","braille":"가능","flex":"지원 필요","flexNote":"지원 필요","reservation":"가능","reservationNote":"개인 폰 사용(보이스오버)","commute":"버스(단독)/지하철(활동보조인)","yearEndTax":"지원 불필요"},"sabbatical":{"y3":{"status":"2027.05.09부터 발생 예정","period":""}}},
+    {"name":"데미안","ldap":"damian.25","spot":"게임즈","joinDate":"2024-10-28","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"","braille":"","flex":"가능","flexNote":"개인 폰 사용","reservation":"가능","reservationNote":"개인 폰 사용","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"2027년 발생 예정","period":""}}},
+    {"name":"모아나","ldap":"moana.j","spot":"페이","joinDate":"2025-10-01","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"가능","reservation":"가능","reservationNote":"","commute":"버스","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"2028년 발생 예정","period":""}}},
+    {"name":"스티븐","ldap":"steven.70","spot":"모빌리티","joinDate":"2026-01-05","disabilityType":"시각장애","disabilityLevel":"중증","visionDetail":"약시","support":{"workMethod":"시각 자료 확인","braille":"","flex":"가능","flexNote":"가능","reservation":"가능","reservationNote":"룸 태블릿PC","commute":"지하철","yearEndTax":"지원 필요"},"sabbatical":{"y3":{"status":"2029년 발생 예정","period":""}}},
+    {"name":"미나","ldap":"mina.m","spot":"카카오(닷투)","joinDate":"2026-04-10","disabilityType":"시각장애","disabilityLevel":"경증","note":"외부 햇빛에 취약 / 실내외 선글라스 착용중","support":null,"sabbatical":{"y3":{"status":"입사 3년 미만 - 2029년 발생 예정","period":""}}},
+    {"name":"아이비","ldap":"ivy.714","spot":"카카오(판교)","joinDate":"2026-07-01","disabilityType":"시각장애","disabilityLevel":"중증","support":null,"sabbatical":{"y3":{"status":"입사 3년 미만 - 2029년 발생 예정","period":""}}}
+  ],
+  "spotSchedules": {
+    "판교 톡클리닉": {"unit":"회차","rounds":[
+      {"round":1,"time":"10:00-10:30","service":"30분","rest":"20분"},
+      {"round":2,"time":"10:50-11:20","service":"30분","rest":"20분"},
+      {"round":3,"time":"11:40-12:20","service":"40분","rest":"30분"},
+      {"round":4,"time":"12:50-13:30","service":"40분","rest":"1시간(점심)"},
+      {"round":5,"time":"14:30-15:00","service":"30분","rest":"20분"},
+      {"round":6,"time":"15:20-15:50","service":"30분","rest":"퇴근"}
+    ], "totalService":"200분"},
+    "제주 톡클리닉": {"unit":"회차","rounds":[
+      {"round":1,"time":"10:00-10:45","service":"45분","rest":"35분"},
+      {"round":2,"time":"11:20-11:50","service":"30분","rest":"30분"},
+      {"round":3,"time":"12:10-12:55","service":"45분","rest":"1시간20분(점심)"},
+      {"round":4,"time":"14:15-14:45","service":"30분","rest":"30분"},
+      {"round":5,"time":"15:05-15:50","service":"45분","rest":"퇴근"}
+    ]},
+    "페이": {"unit":"회차","note":"안마실1: 한스 / 안마실2: 실버 / 안마실3: 모아나","rounds":[
+      {"round":1,"time":"10:00-10:30","service":"30분","rest":"30분"},
+      {"round":2,"time":"11:00-11:30","service":"30분","rest":"30분"},
+      {"round":3,"time":"12:00-12:30","service":"30분","rest":"1시간30분(점심)"},
+      {"round":4,"time":"14:00-14:30","service":"30분","rest":"30분"},
+      {"round":5,"time":"15:00-15:30","service":"30분","rest":"30분"},
+      {"round":6,"time":"16:00-16:30","service":"30분","rest":"퇴근"}
+    ]},
+    "모빌리티": {"unit":"회차","note":"상쾌해: 아서 / 시원해: 스티븐 (2·3회차 시간 일부 변경: 11:30~12:00→11:00~11:30, 12:30~13:00→12:00~12:30)","rounds":[
+      {"round":1,"time":"10:00-10:30","service":"30분","rest":"1시간"},
+      {"round":2,"time":"11:00-11:30 (변경 전 11:30-12:00)","service":"30분","rest":"30분"},
+      {"round":3,"time":"12:00-12:30 (변경 전 12:30-13:00)","service":"30분","rest":"1시간(점심)"},
+      {"round":4,"time":"14:00-14:30","service":"30분","rest":"30분"},
+      {"round":5,"time":"15:00-15:30","service":"30분","rest":"30분"},
+      {"round":6,"time":"16:00-16:30","service":"30분","rest":"퇴근"}
+    ], "totalService":"180분"},
+    "게임즈": {"unit":"요일제","note":"사이다룸1(앨빈)·사이다룸2(데미안) - 요일별 회차 수가 달라지는 자유근무제. 1회차는 화~금만 운영. 상세 분단위 시간은 원본 '스팟별 근무 시간표' 시트 참고 권장.","weekdayRoundCounts":{"월":6,"화":7,"수":7,"목":7,"금":6}}
+  }
+}
+
+</script>
+<script id="monitoring-data" type="application/json">{"페이":{"totalResponses":229,"monthly":{"1":{"total":35,"counts":{"매우 만족":32,"만족":3},"sumScore":172,"scoredCount":35},"2":{"total":25,"counts":{"매우 만족":20,"만족":4,"보통":1},"sumScore":119,"scoredCount":25},"3":{"total":36,"counts":{"매우 만족":33,"만족":3},"sumScore":177,"scoredCount":36},"4":{"total":37,"counts":{"매우 만족":32,"만족":4},"sumScore":176,"scoredCount":36},"5":{"total":9,"counts":{"매우 만족":8,"만족":1},"sumScore":44,"scoredCount":9},"6":{"total":32,"counts":{"매우 만족":31,"만족":1},"sumScore":159,"scoredCount":32},"7":{"total":25,"counts":{"만족":5,"매우 만족":19,"보통":1},"sumScore":118,"scoredCount":25},"8":{"total":30,"counts":{"매우 만족":25,"만족":5},"sumScore":145,"scoredCount":30}},"byPerson":{"안마실 2 Silver":{"monthly":{"1":{"total":13,"counts":{"매우 만족":11,"만족":2},"sumScore":63,"scoredCount":13},"2":{"total":8,"counts":{"매우 만족":6,"만족":2},"sumScore":38,"scoredCount":8},"3":{"total":10,"counts":{"매우 만족":9,"만족":1},"sumScore":49,"scoredCount":10},"4":{"total":7,"counts":{"매우 만족":5,"만족":2},"sumScore":33,"scoredCount":7},"5":{"total":4,"counts":{"매우 만족":3,"만족":1},"sumScore":19,"scoredCount":4},"6":{"total":11,"counts":{"매우 만족":11},"sumScore":55,"scoredCount":11},"7":{"total":4,"counts":{"매우 만족":4},"sumScore":20,"scoredCount":4},"8":{"total":8,"counts":{"만족":2,"매우 만족":6},"sumScore":38,"scoredCount":8}},"total":65,"counts":{"매우 만족":55,"만족":10},"sumScore":315,"scoredCount":65},"안마실 3 moana":{"monthly":{"1":{"total":10,"counts":{"매우 만족":10},"sumScore":50,"scoredCount":10},"2":{"total":7,"counts":{"매우 만족":6,"만족":1},"sumScore":34,"scoredCount":7},"3":{"total":13,"counts":{"매우 만족":12,"만족":1},"sumScore":64,"scoredCount":13},"4":{"total":14,"counts":{"매우 만족":13},"sumScore":65,"scoredCount":13},"5":{"total":5,"counts":{"매우 만족":5},"sumScore":25,"scoredCount":5},"6":{"total":11,"counts":{"매우 만족":11},"sumScore":55,"scoredCount":11},"7":{"total":9,"counts":{"만족":2,"매우 만족":7},"sumScore":43,"scoredCount":9},"8":{"total":11,"counts":{"매우 만족":11},"sumScore":55,"scoredCount":11}},"total":80,"counts":{"매우 만족":75,"만족":4},"sumScore":391,"scoredCount":79},"안마실 1 Hans":{"monthly":{"1":{"total":12,"counts":{"매우 만족":11,"만족":1},"sumScore":59,"scoredCount":12},"2":{"total":9,"counts":{"매우 만족":8,"보통":1},"sumScore":43,"scoredCount":9},"3":{"total":13,"counts":{"매우 만족":12,"만족":1},"sumScore":64,"scoredCount":13},"4":{"total":15,"counts":{"매우 만족":13,"만족":2},"sumScore":73,"scoredCount":15},"6":{"total":9,"counts":{"매우 만족":8,"만족":1},"sumScore":44,"scoredCount":9},"7":{"total":12,"counts":{"만족":3,"매우 만족":8,"보통":1},"sumScore":55,"scoredCount":12},"8":{"total":11,"counts":{"매우 만족":8,"만족":3},"sumScore":52,"scoredCount":11}},"total":81,"counts":{"매우 만족":68,"만족":11,"보통":2},"sumScore":390,"scoredCount":81}}},"모빌리티":{"totalResponses":130,"monthly":{"1":{"total":24,"counts":{"만족":5,"매우 만족":19},"sumScore":115,"scoredCount":24},"2":{"total":12,"counts":{"매우 만족":12},"sumScore":60,"scoredCount":12},"3":{"total":16,"counts":{"매우 만족":13,"만족":3},"sumScore":77,"scoredCount":16},"4":{"total":16,"counts":{"매우 만족":16},"sumScore":80,"scoredCount":16},"5":{"total":9,"counts":{"매우 만족":9},"sumScore":45,"scoredCount":9},"6":{"total":23,"counts":{"매우 만족":20,"만족":3},"sumScore":112,"scoredCount":23},"7":{"total":22,"counts":{"매우 만족":19,"만족":2,"불만족":1},"sumScore":105,"scoredCount":22},"8":{"total":5,"counts":{"매우 만족":5},"sumScore":25,"scoredCount":5},"9":{"total":3,"counts":{"매우 만족":3},"sumScore":15,"scoredCount":3}},"byPerson":{"시원해 (스티븐)":{"monthly":{"1":{"total":14,"counts":{"만족":4,"매우 만족":10},"sumScore":66,"scoredCount":14},"2":{"total":8,"counts":{"매우 만족":8},"sumScore":40,"scoredCount":8},"3":{"total":11,"counts":{"매우 만족":8,"만족":3},"sumScore":52,"scoredCount":11},"4":{"total":9,"counts":{"매우 만족":9},"sumScore":45,"scoredCount":9},"5":{"total":6,"counts":{"매우 만족":6},"sumScore":30,"scoredCount":6},"6":{"total":13,"counts":{"매우 만족":12,"만족":1},"sumScore":64,"scoredCount":13},"7":{"total":7,"counts":{"매우 만족":6,"불만족":1},"sumScore":32,"scoredCount":7},"8":{"total":3,"counts":{"매우 만족":3},"sumScore":15,"scoredCount":3},"9":{"total":2,"counts":{"매우 만족":2},"sumScore":10,"scoredCount":2}},"total":73,"counts":{"만족":8,"매우 만족":64,"불만족":1},"sumScore":354,"scoredCount":73},"상쾌해 (아서)":{"monthly":{"1":{"total":10,"counts":{"매우 만족":9,"만족":1},"sumScore":49,"scoredCount":10},"2":{"total":4,"counts":{"매우 만족":4},"sumScore":20,"scoredCount":4},"3":{"total":5,"counts":{"매우 만족":5},"sumScore":25,"scoredCount":5},"4":{"total":7,"counts":{"매우 만족":7},"sumScore":35,"scoredCount":7},"5":{"total":3,"counts":{"매우 만족":3},"sumScore":15,"scoredCount":3},"6":{"total":10,"counts":{"매우 만족":8,"만족":2},"sumScore":48,"scoredCount":10},"7":{"total":15,"counts":{"매우 만족":13,"만족":2},"sumScore":73,"scoredCount":15},"8":{"total":2,"counts":{"매우 만족":2},"sumScore":10,"scoredCount":2},"9":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1}},"total":57,"counts":{"매우 만족":52,"만족":5},"sumScore":280,"scoredCount":57}}},"게임즈":{"totalResponses":109,"monthly":{"1":{"total":33,"counts":{"매우 만족":28,"매우 불만족":1,"만족":3,"보통":1},"sumScore":156,"scoredCount":33},"2":{"total":10,"counts":{"만족":3,"매우 만족":7},"sumScore":47,"scoredCount":10},"3":{"total":20,"counts":{"매우 만족":19,"보통":1},"sumScore":98,"scoredCount":20},"4":{"total":9,"counts":{"매우 만족":7,"만족":2},"sumScore":43,"scoredCount":9},"5":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1},"8":{"total":34,"counts":{"매우 만족":27,"만족":7},"sumScore":163,"scoredCount":34},"9":{"total":2,"counts":{"매우 만족":2},"sumScore":10,"scoredCount":2}},"byPerson":{"사이다룸1 (앨빈)":{"monthly":{"1":{"total":22,"counts":{"매우 만족":20,"만족":2},"sumScore":108,"scoredCount":22},"2":{"total":9,"counts":{"만족":2,"매우 만족":7},"sumScore":43,"scoredCount":9},"3":{"total":13,"counts":{"매우 만족":13},"sumScore":65,"scoredCount":13},"4":{"total":6,"counts":{"매우 만족":6},"sumScore":30,"scoredCount":6},"8":{"total":24,"counts":{"매우 만족":20,"만족":4},"sumScore":116,"scoredCount":24},"9":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1}},"total":75,"counts":{"매우 만족":67,"만족":8},"sumScore":367,"scoredCount":75},"사이다룸2 (데미안)":{"monthly":{"1":{"total":11,"counts":{"매우 만족":8,"매우 불만족":1,"만족":1,"보통":1},"sumScore":48,"scoredCount":11},"2":{"total":1,"counts":{"만족":1},"sumScore":4,"scoredCount":1},"3":{"total":7,"counts":{"매우 만족":6,"보통":1},"sumScore":33,"scoredCount":7},"4":{"total":3,"counts":{"만족":2,"매우 만족":1},"sumScore":13,"scoredCount":3},"5":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1},"8":{"total":10,"counts":{"매우 만족":7,"만족":3},"sumScore":47,"scoredCount":10},"9":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1}},"total":34,"counts":{"매우 만족":24,"매우 불만족":1,"만족":7,"보통":2},"sumScore":155,"scoredCount":34}}},"판교 톡클리닉":{"totalResponses":588,"monthly":{"1":{"total":52,"counts":{"매우 만족":44,"약간 만족":3,"약간 불만족":2,"보통":2,"매우 불만족":1},"sumScore":243,"scoredCount":52},"2":{"total":41,"counts":{"매우 만족":39,"약간 불만족":1,"약간 만족":1},"sumScore":201,"scoredCount":41},"3":{"total":64,"counts":{"매우 만족":56,"매우 불만족":3,"보통":2,"약간 만족":3},"sumScore":301,"scoredCount":64},"4":{"total":69,"counts":{"매우 만족":59,"약간 만족":6,"보통":2,"매우 불만족":1,"약간 불만족":1},"sumScore":328,"scoredCount":69},"5":{"total":63,"counts":{"매우 만족":57,"보통":1,"약간 불만족":2,"약간 만족":3},"sumScore":304,"scoredCount":63},"6":{"total":68,"counts":{"매우 만족":59,"보통":4,"약간 불만족":2,"약간 만족":2,"매우 불만족":1},"sumScore":320,"scoredCount":68},"7":{"total":100,"counts":{"매우 만족":90,"약간 불만족":2,"약간 만족":6,"보통":2},"sumScore":484,"scoredCount":100},"8":{"total":87,"counts":{"매우 만족":78,"약간 만족":5,"보통":1,"매우 불만족":2,"약간 불만족":1},"sumScore":417,"scoredCount":87},"9":{"total":44,"counts":{"매우 만족":42,"약간 만족":1,"보통":1},"sumScore":217,"scoredCount":44}},"byPerson":{".":{"monthly":{"5":{"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1}},"total":1,"counts":{"매우 만족":1},"sumScore":5,"scoredCount":1}}},"제주 톡클리닉":{"totalResponses":0,"monthly":{},"byPerson":{}}}</script>
+
+<script id="negcomments-data" type="application/json">
+{"페이":[],"모빌리티":[{"month":7,"day":8,"sat":"불만족","comment":"제공된 옷이 지나치게 낡아있었음. 베개커버가 씌워져있지 않았음. 서비스 수준이 만족스럽지 않았음.","person":"시원해 (스티븐)"}],"게임즈":[{"month":1,"day":26,"sat":"매우 불만족","comment":"","person":"사이다룸2 (데미안)"}],"판교 톡클리닉":[{"month":1,"day":14,"sat":"약간 불만족","comment":"헬스키퍼님과 대화 없이 조용히 받고 싶어요. \n그리고 목 부위 마사지 부위를 너무 하셨는지 오후부터 계속 목이 더 아프네요.","person":""},{"month":1,"day":26,"sat":"약간 불만족","comment":"모든 헬스키퍼분들께 너무 감사하지만..ㅠㅠ lucas님은 받을 때 마다 매번 대화를 진행하시는데, 항상 부동산 얘기를 하십니다..ㅠㅠㅠ 갈 때 마다 동일한 내용이에용. 그래서 계속 호응하고 답변드려야하는 것이 조금 힘들어요.. 반말로 계속 \"이렇게 저렇게 해야한다.\" 말씀하시는데 수다쟁이 택시기사님과 있는 느낌이 있습니다T.T.. 주로 피해서 신청하지만 간혹 당첨이 lucas님으로 되는 날에는 각오하고 방문하고 있습니닷......","person":""},{"month":1,"day":28,"sat":"매우 불만족","comment":"1번 방 루카스는 말이 너~무 많으셨어요.., 3번방 조나단은 압체크를 안하시고 너무 간질간질할 정도로만 해주셔서 좀 아쉬웠습니다.","person":""},{"month":2,"day":10,"sat":"약간 불만족","comment":"","person":""},{"month":3,"day":3,"sat":"매우 불만족","comment":"압이 하나도 안쉬원해요 두번이나 말씀드렸는데 더는 힘들데요ㅠㅠ 저는 여사원이고 과한 부탁을 한것도 아닌데 너무 쉽게 하시려는것 같아서 아쉬움이 남아요","person":""},{"month":3,"day":16,"sat":"매우 불만족","comment":"마사지 자체에 대해 만족하지 못하였음.","person":""},{"month":3,"day":27,"sat":"매우 불만족","comment":"끝났다고 말씀도 안하시고 갑자기 의자만 제쪽으로 쭉 미뤄두시더니 나가셨어요. 시작때 종아리 마사지도 되려나 싶어 선생님 종아리도 될까요 하고 정중히 여쭈었고, 가능하다고 하셔서 받는 중에 발목쪽을 요청드렸는데 종아리가 뭉쳐서 거길 해야한다고 하셔서 그렇구나 하고 받았습니다. 그러다 나가셔서 시계를 보니 끝날시간이었고, 인사없이 급하게 나가신거 같아서 혹시 뭔가 가지러 가셨을까하고 기다렸는데 오지 않으셨습니다. 제가 뭘 불편하게 해드렸을까 싶은 생각이 들게 불쾌한 마무리였습니다. 끝나면 끝났다고 말씀주셨으면 합니다. 개선 요청드립니다.","person":""},{"month":4,"day":29,"sat":"매우 불만족","comment":"여자 관리사분이 한 분뿐이라 계속 이용하게 되는데, 전반적으로 압력이 많이 약해서 피부만 스치는 느낌이었습니다. 또한 관리 중간에 졸으시는 모습도 보여 아쉬움이 컸습니다. 전반적으로 만족도가 높지 않았습니다.","person":""},{"month":4,"day":30,"sat":"약간 불만족","comment":"","person":""},{"month":5,"day":11,"sat":"약간 불만족","comment":"사람들 왔다갔다하는데 문을 열고 클리닉을 진행해서 불편했습니다","person":""},{"month":5,"day":21,"sat":"약간 불만족","comment":"너무 말을 많이 하셔서 힘들었어요...","person":""},{"month":6,"day":5,"sat":"약간 불만족","comment":"어느 부위 받기 희망 하는지는 물어보셨는데 이후 매우 약한 압으로 진행되고 적당한지 묻지 않았음. 압과 스킬 모두  무성의해 보여 아쉽습니다. ㅠㅠ","person":""},{"month":6,"day":12,"sat":"약간 불만족","comment":"루카스에게 안마를 받았는데, 몇 차례 비슷한 불편함이 반복되어 고민 끝에 후기를 남깁니다.\n\n저는 보통 목/어깨와 종아리 위주로 요청드리고 있어, 다른 안마사분들께 받을 때도 대체로 비슷한 부위를 관리받고 있습니다. 그런데 루카스의 경우 마사지 후 컨디션이 나아진다기보다 오히려 통증이나 불편함이 남았던 적이 여러 번 있었습니다.\n\n가장 불편했던 부분은 손가락 끝이나 엄지로 특정 부위를 강하게 누른 뒤, 제가 움찔하거나 아파하면 “아프냐”고 물으시고 “몸이 좋지 않아서 그런 것”이라고 설명하시는 방식이었습니다. 예를 들어 발바닥 아치 중앙을 엄지로 강하게 누르거나, 어깨 쪽 근육을 손바닥이 아니라 손가락으로 꼬집듯이 근육을 강하게 쥐어짜는 경우가 있었습니다. 제 느낌으로는 몸 상태와 관계없이 누구라도 통증을 느낄 수밖에 없는 방식처럼 느껴졌어요~\n\n현장에서 “근육을 꼬집듯이 누르지 말아달라”, “눌러도 되는 자리(발바닥)가 맞냐”고 말씀드린 적도 있었지만, 몸이 좋지 않아서 그런거라고 하시면서 제 피드백이 충분히 반영되지는 않았고 오늘은 마사지가 끝난 뒤 내려오자마자 발바닥에 쥐가 났네요ㅠㅠ 우선 평소에 격하게 운동을 한다거나 과하게 근육이 뭉치는 스타일도 아니라서 제 정도의 몸이 몸 컨디션 때문에 마사지가 아플 정도의 몸이라는게 이해가 가지 않았습니다.\n\n또한 어떤 운동을 하는지, 어디에 사는지 등 개인적인 질문이 다소 많아 불편했던 경험도 있었는데요, 이 부분은 이전에도 후기로 남긴 적이 있습니다. 대답을 제대로 안 드리니 오늘은 더 안 여쭤보시긴 했어요.\n\n다른 안마사분들께 받을 때는 경험하지 못했던 방식이라, 마사지 강도와 방식, 이용자 피드백 반영 부분에 대해 개선이 필요해 보입니다! 또한 예약현황 상 항상 다른 분들에 비해 예약 경쟁률이 낮은 편으로 보여, 연관이 있을지 살펴보시면 어떨지 싶어 의견 드립니다.","person":""},{"month":6,"day":16,"sat":"매우 불만족","comment":"헬스키퍼분의 태도와 마사지 수준이 최악이었습니다. 그냥 시간 때우기 수준으로만 느껴지네요.","person":""},{"month":7,"day":2,"sat":"약간 불만족","comment":"마사지 압 확인 없이 진행해서, 시원하다는 느낌이 없었고 시간만 뗴우는 느낌이었습니다.","person":""},{"month":7,"day":7,"sat":"약간 불만족","comment":"마사지라기 보다는 그냥 살짝 터치하는 정도 같아요. 좀 더 마사지압이나 마사지 방법을 다양하게 해주시면 좋을 것 같아요. 너무 살살 극소부위만 조물딱 하시길래 워밍업은 언제 끝나려나 싶었는데 시간이 종료되었다고해서 당황스러웠어요. 시간빼서 오는건데 시간이 좀 아까웠어요","person":""},{"month":8,"day":21,"sat":"매우 불만족","comment":"마사지 압을 더 강하게 해달라고 3번 말씀드렸으나 차이가 없었습니다.\n등 마사지의 경우 몸통이 고정된 상태에서 진행되어야 하는데 한쪽으로 누운 상태로 등을 누르다보니 몸 전체가 흔들리며 제대로 된 마사지를 받았다고 생각되지 않습니다.\n문도 열어둔 상태였고, 닫으려고 하니 일부러 열어두셨다 하여 열린 상태로 진행했습니다.","person":""},{"month":8,"day":27,"sat":"약간 불만족","comment":"너무 급하게 마사지 시작+진행+마무리 하셔서 아쉬웠습니다 ㅜㅜ","person":""},{"month":8,"day":28,"sat":"매우 불만족","comment":"지압이 약해서 대충 대충한다는 느낌을 받았습니다.","person":""}],"제주 톡클리닉":[]}
+</script>
+
+<script>
+const PERSONNEL = JSON.parse(document.getElementById('personnel-data').textContent);
+const MONITORING = JSON.parse(document.getElementById('monitoring-data').textContent);
+const NEGATIVE_COMMENTS = JSON.parse(document.getElementById('negcomments-data').textContent);
+const TODAY = new Date(2026,8,1); // 2026-09-01
+const MAX_MONTH = Math.max(1, ...Object.values(MONITORING).flatMap(d => Object.keys(d.monthly||{}).map(Number)));
+const MONTH_RANGE_LABEL = `1–${MAX_MONTH}월`;
+const MONTH_RANGE_ARR = Array.from({length: MAX_MONTH}, (_,i)=>i+1);
+
+/* ---------- shared helpers ---------- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function monthsOf(obj){ return Object.keys(obj||{}).map(Number).sort((a,b)=>a-b); }
+function sentiment(label){
+  if(label.indexOf('불만족')>=0) return 'neg';
+  if(label.indexOf('보통')>=0) return 'neu';
+  if(label.indexOf('만족')>=0) return 'pos';
+  return 'neu';
+}
+function bucket(counts){
+  const b={pos:0,neu:0,neg:0};
+  Object.entries(counts||{}).forEach(([k,v])=>{ if(!k) return; b[sentiment(k)]+=v; });
+  return b;
+}
+function avg2(sum,n){ return n>0 ? (sum/n) : null; }
+const tipEl = document.getElementById('tooltip');
+function showTip(evt,html){
+  tipEl.innerHTML = html;
+  tipEl.classList.add('show');
+  moveTip(evt);
+}
+function moveTip(evt){
+  const pad=14;
+  let x=evt.clientX+pad, y=evt.clientY+pad;
+  tipEl.style.left = x+'px';
+  tipEl.style.top = y+'px';
+}
+function hideTip(){ tipEl.classList.remove('show'); }
+
+/* =========================================================
+   TAB 1 — 인적사항 및 서비스
+   ========================================================= */
+const SPOT_ALIAS = {
+  "카카오(판교)":"판교 톡클리닉",
+  "카카오(닷투)":"제주 톡클리닉",
+  "페이":"페이",
+  "게임즈":"게임즈",
+  "모빌리티":"모빌리티"
+};
+const SPOT_BADGE_LABEL = {
+  "카카오(판교)":"판교",
+  "카카오(닷투)":"제주(닷투)",
+  "페이":"페이",
+  "게임즈":"게임즈",
+  "모빌리티":"모빌리티"
+};
+
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+
+function renderPeopleStats(){
+  const people = PERSONNEL.people;
+  const spots = new Set(people.map(p=>p.spot));
+  const y2026 = people.filter(p => JSON.stringify(p.sabbatical).indexOf('2026') >= 0).length;
+  const recent = people.filter(p => daysBetween(new Date(p.joinDate), TODAY) <= 90 && daysBetween(new Date(p.joinDate), TODAY) >= 0);
+  return `
+  <section class="block">
+    <div class="mosaic">
+      <div class="tile blue">
+        <div class="ticon">👥</div>
+        <div class="tlabel">총 인원</div>
+        <div class="tval num">${people.length}<span style="font-size:16px;">명</span></div>
+        <div class="tfoot">시각장애 헬스키퍼 전원</div>
+      </div>
+      <div class="tile neutral">
+        <div class="ticon">📍</div>
+        <div class="tlabel">근무 스팟</div>
+        <div class="tval num">${spots.size}<span style="font-size:16px;">곳</span></div>
+        <div class="tfoot">판교·제주(닷투)·페이·게임즈·모빌리티</div>
+      </div>
+      <div class="tile green">
+        <div class="ticon">🌿</div>
+        <div class="tlabel">2026년 안식휴가 해당</div>
+        <div class="tval num">${y2026}<span style="font-size:16px;">명</span></div>
+        <div class="tfoot">발생·사용·예정 포함</div>
+      </div>
+      <div class="tile neutral">
+        <div class="ticon">✨</div>
+        <div class="tlabel">최근 90일 입사</div>
+        <div class="tval num">${recent.length}<span style="font-size:16px;">명</span></div>
+        <div class="tfoot">${recent.map(p=>p.name).join(', ') || '해당 없음'}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function scheduleTableHTML(spotKey){
+  const sched = PERSONNEL.spotSchedules[spotKey];
+  if(!sched) return `<div class="schedule-note">등록된 근무 시간표가 없습니다.</div>`;
+  if(sched.unit === '요일제'){
+    const days = Object.entries(sched.weekdayRoundCounts);
+    return `
+      <table class="schedule-table">
+        <thead><tr>${days.map(([d])=>`<th>${d}</th>`).join('')}</tr></thead>
+        <tbody><tr>${days.map(([,c])=>`<td>${c}회차</td>`).join('')}</tr></tbody>
+      </table>
+      <div class="schedule-note">${esc(sched.note||'')}</div>`;
+  }
+  return `
+    <table class="schedule-table">
+      <thead><tr><th>회차</th><th>시간</th><th>서비스</th><th>휴게</th></tr></thead>
+      <tbody>
+        ${sched.rounds.map(r=>`<tr><td>${r.round}</td><td class="num">${esc(r.time)}</td><td>${esc(r.service)}</td><td>${esc(r.rest)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    ${sched.totalService?`<div class="schedule-note">총 서비스시간 ${sched.totalService}</div>`:''}
+    ${sched.note?`<div class="schedule-note">${esc(sched.note)}</div>`:''}
+  `;
+}
+
+function supportCardHTML(p){
+  if(!p.support){
+    return `<div class="schedule-note">입사 초기로 장애지원사항 등록 대기 중입니다.${p.note?(' · '+esc(p.note)):''}</div>`;
+  }
+  const s = p.support;
+  const rows = [
+    ['업무 수행 방법', s.workMethod || '—'],
+    ['점자 사용', s.braille || '—'],
+    ['플렉스 근무', [s.flex,s.flexNote].filter(Boolean).join(' · ') || '—'],
+    ['예약 확인', [s.reservation,s.reservationNote].filter(Boolean).join(' · ') || '—'],
+    ['통근 수단', s.commute || '—'],
+    ['연말정산 지원', s.yearEndTax || '—'],
+  ];
+  return `<div>${rows.map(([k,v])=>`<div class="kv"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join('')}</div>
+  ${p.note?`<div class="schedule-note">${esc(p.note)}</div>`:''}`;
+}
+
+function sabbaticalHTML(p){
+  const sab = p.sabbatical||{};
+  const order = [['y3','3년차'],['y6','6년차'],['y9','9년차']];
+  const items = order.filter(([k])=>sab[k]).map(([k,label])=>{
+    const e = sab[k];
+    const isDone = !!(e.period && e.period !== '-' ) || (e.status && e.status.indexOf('사용')===0);
+    return `<div class="tl-item">
+      <div class="tl-dot ${isDone?'done':'pending'}"></div>
+      <div>
+        <div class="tl-main">${label} · ${esc(e.status||'')}</div>
+        ${e.period?`<div class="tl-sub">사용 이력 ${esc(e.period)}</div>`:''}
+        ${e.plan?`<div class="tl-sub">사용 계획 ${esc(e.plan)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="timeline">${items || '<div class="schedule-note">아직 안식휴가 발생 이력이 없습니다.</div>'}</div>`;
+}
+
+function personRowHTML(p, idx){
+  const spotKey = SPOT_ALIAS[p.spot] || p.spot;
+  const initial = p.name.slice(0,1);
+  return `
+  <div class="prow" data-name="${esc(p.name)}" data-spot="${esc(p.spot)}">
+    <div class="prow-head" onclick="this.parentElement.classList.toggle('open')">
+      <div class="avatar">${initial}</div>
+      <div>
+        <div class="pname">${esc(p.name)}</div>
+        <div class="pldap">@${esc(p.ldap)}</div>
+      </div>
+      <div class="col-ldap"><span class="badge spot">${esc(SPOT_BADGE_LABEL[p.spot]||p.spot)}</span></div>
+      <div class="col-disability"><span class="badge">${esc(p.disabilityType)} · ${esc(p.disabilityLevel)}${p.visionDetail?(' · '+esc(p.visionDetail)):''}</span></div>
+      <div class="col-join pjoin num">입사 ${esc(p.joinDate)}</div>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="prow-body">
+      <div class="pbody-grid">
+        <div class="pbody-card">
+          <h4>스팟별 근무 시간표 — ${esc(SPOT_BADGE_LABEL[p.spot]||p.spot)}</h4>
+          ${scheduleTableHTML(spotKey)}
+        </div>
+        <div class="pbody-card">
+          <h4>장애 지원 사항</h4>
+          ${supportCardHTML(p)}
+        </div>
+      </div>
+      <div class="pbody-card" style="margin-top:14px;">
+        <h4>안식휴가 발생 · 사용 이력</h4>
+        ${sabbaticalHTML(p)}
+      </div>
+    </div>
+  </div>`;
+}
+
+let peopleFilter = 'all';
+let peopleQuery = '';
+function renderRoster(){
+  const spots = Array.from(new Set(PERSONNEL.people.map(p=>p.spot)));
+  const pills = ['all',...spots];
+  const list = PERSONNEL.people.filter(p=>{
+    if(peopleFilter!=='all' && p.spot!==peopleFilter) return false;
+    if(peopleQuery && !(p.name+p.ldap).toLowerCase().includes(peopleQuery.toLowerCase())) return false;
+    return true;
+  });
+  return `
+  <section class="block">
+    <div class="block-head">
+      <h2>인적사항 &amp; 서비스 매칭</h2>
+      <div class="desc">이름을 클릭하면 소속 스팟의 근무 시간표 · 장애지원사항 · 안식휴가 이력이 펼쳐집니다</div>
+    </div>
+    <div class="toolbar">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="peopleSearch" placeholder="이름 또는 LDAP 검색" value="${esc(peopleQuery)}" oninput="peopleQuery=this.value; rerenderRoster();">
+      </div>
+      <div class="filterpills">
+        ${pills.map(s=>`<button class="fpill ${peopleFilter===s?'active':''}" onclick="peopleFilter='${esc(s)}'; rerenderRoster();">${s==='all'?'전체':esc(SPOT_BADGE_LABEL[s]||s)}</button>`).join('')}
+      </div>
+    </div>
+    <div class="roster" id="rosterList">
+      ${list.map(personRowHTML).join('') || '<div class="emptystate"><div class="glyph">🔍</div><h3>검색 결과가 없어요</h3><p>다른 이름이나 스팟으로 찾아보세요</p></div>'}
+    </div>
+  </section>`;
+}
+function rerenderRoster(){
+  const container = document.getElementById('view-people');
+  const rosterSection = container.querySelector('#rosterList').closest('section');
+  rosterSection.outerHTML = renderRoster();
+}
+
+function renderPeopleView(){
+  document.getElementById('view-people').innerHTML = renderPeopleStats() + renderRoster();
+}
+
+/* =========================================================
+   TAB 2 — 모니터링 취합
+   ========================================================= */
+const SPOT_ORDER = ["페이","모빌리티","게임즈","판교 톡클리닉","제주 톡클리닉"];
+const SPOT_COLOR_VAR = {"페이":"--spot-a","모빌리티":"--spot-b","게임즈":"--spot-a","판교 톡클리닉":"--spot-b","제주 톡클리닉":"--spot-a"};
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+function overallStats(){
+  let totalResp=0, sumScore=0, scoredCount=0, pos=0,neu=0,neg=0, activeSpots=0;
+  SPOT_ORDER.forEach(spot=>{
+    const d = MONITORING[spot];
+    if(!d || !d.totalResponses){ return; }
+    activeSpots++;
+    totalResp += d.totalResponses;
+    Object.values(d.monthly).forEach(m=>{
+      sumScore+=m.sumScore; scoredCount+=m.scoredCount;
+      const b=bucket(m.counts); pos+=b.pos; neu+=b.neu; neg+=b.neg;
+    });
+  });
+  const posRatio = (pos+neu+neg)>0 ? Math.round(pos/(pos+neu+neg)*100) : null;
+  return {totalResp, avg: avg2(sumScore,scoredCount), posRatio, activeSpots};
+}
+
+function renderMonitorOverview(){
+  const s = overallStats();
+  return `
+  <section class="block">
+    <div class="block-head">
+      <h2>전체 개요</h2>
+      <div class="desc">5개 스팟 · 2026년 ${MONTH_RANGE_LABEL} 응답 취합 기준</div>
+    </div>
+    <div class="kpirow">
+      <div class="kpi">
+        <div class="klabel">총 응답수</div>
+        <div class="kval num">${s.totalResp.toLocaleString()}<small>건</small></div>
+      </div>
+      <div class="kpi">
+        <div class="klabel">평균 만족도</div>
+        <div class="kval num">${s.avg? s.avg.toFixed(2):'—'}<small>/5</small></div>
+      </div>
+      <div class="kpi">
+        <div class="klabel">긍정 응답 비율</div>
+        <div class="kval num">${s.posRatio!=null? s.posRatio:'—'}<small>%</small></div>
+      </div>
+      <div class="kpi">
+        <div class="klabel">데이터 보유 스팟</div>
+        <div class="kval num">${s.activeSpots}<small>/5</small></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function spotComparisonHTML(){
+  const rows = SPOT_ORDER.map(spot=>({spot, total:(MONITORING[spot]&&MONITORING[spot].totalResponses)||0}));
+  const max = Math.max(1, ...rows.map(r=>r.total));
+  return `
+  <section class="block">
+    <div class="chart-card">
+      <h3>스팟별 총 응답수</h3>
+      <div class="sub">${MONTH_RANGE_LABEL} 누적 · 응답 건수 기준</div>
+      <div style="display:flex; flex-direction:column; gap:12px; padding:6px 0 14px;">
+        ${rows.map(r=>`
+          <div style="display:grid; grid-template-columns:110px 1fr 56px; align-items:center; gap:10px;">
+            <div style="font-size:12.5px; font-weight:700;">${esc(r.spot)}</div>
+            <div style="background:var(--paper-2); border-radius:6px; height:14px; overflow:hidden;">
+              <div style="width:${(r.total/max*100).toFixed(1)}%; height:100%; background:var(${SPOT_COLOR_VAR[r.spot]}); border-radius:6px;"></div>
+            </div>
+            <div class="num" style="font-size:12.5px; font-weight:800; text-align:right;">${r.total}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+function monthLabel(m){ return m+'월'; }
+
+const SENT_ORDER = ['매우 만족','만족','약간 만족','보통','약간 불만족','불만족','매우 불만족'];
+const SENT_COLOR = {
+  '매우 만족':'var(--blue)', '만족':'var(--blue-light)', '약간 만족':'var(--blue-light)',
+  '보통':'var(--green)',
+  '약간 불만족':'var(--neutral)', '불만족':'var(--neutral-dark)', '매우 불만족':'var(--neutral-dark)'
+};
+
+function satisfactionDonut(monthlyObj, size){
+  const totals = {};
+  Object.values(monthlyObj).forEach(m=>{
+    Object.entries(m.counts||{}).forEach(([k,v])=>{ if(!k) return; totals[k]=(totals[k]||0)+v; });
+  });
+  const segs = SENT_ORDER.filter(k=>totals[k]>0).map(k=>({label:k, value:totals[k], color:SENT_COLOR[k]}));
+  const total = segs.reduce((a,s)=>a+s.value,0);
+  if(total===0) return '<div class="schedule-note">집계할 만족도 응답이 없습니다.</div>';
+
+  const S = size||176, sw=30, r=(S-sw)/2, cx=S/2, cy=S/2, C=2*Math.PI*r, GAP=segs.length>1?3:0;
+  let offset=0, rings='';
+  segs.forEach(s=>{
+    const frac = s.value/total;
+    const len = Math.max(0, frac*C - GAP);
+    rings += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}"
+      stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round" class="seg"
+      onmousemove="moveTip(event)" onmouseenter="showTip(event,'${esc(s.label)} · '+${s.value}+'건 ('+${Math.round(s.value/total*100)}+'%)')" onmouseleave="hideTip()"></circle>`;
+    offset += frac*C;
+  });
+  const legend = segs.slice().sort((a,b)=>b.value-a.value).map(s=>`
+    <div class="donut-row">
+      <span class="dsw" style="background:${s.color}"></span>
+      <span class="dlabel">${esc(s.label)}</span>
+      <span class="dpct num">${Math.round(s.value/total*100)}%</span>
+      <span class="dcount num">${s.value}건</span>
+    </div>`).join('');
+  return `
+  <div class="donut-wrap">
+    <svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${rings}</svg>
+    <div class="donut-legend">${legend}</div>
+  </div>`;
+}
+
+function monthlyTrendMini(spot, monthlyObj){
+  const months = monthsOf(monthlyObj);
+  if(months.length===0) return '';
+  const present = SENT_ORDER.filter(k => months.some(m => (monthlyObj[m].counts||{})[k] > 0));
+  const hasNeg = present.some(k=>sentiment(k)==='neg');
+  const W=680,H=210,padL=8,padR=8,padB=26,padT=22;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const bw = plotW/months.length;
+  const barW = Math.min(46, bw*0.56);
+  const maxTotal = Math.max(1, ...months.map(m=>present.reduce((a,k)=>a+((monthlyObj[m].counts||{})[k]||0),0)));
+  const MIN_HIT_H = 14; // guarantees a comfortably clickable target even when the real segment is a 1-2px sliver
+  const MIN_SEG_H = 4; // guarantees every present category renders a visible sliver, even at a tiny share of the bar
+  let bars='', hits='';
+  months.forEach((m,i)=>{
+    const cx = padL+bw*i+bw/2;
+    let y = padT+plotH;
+    const negSegs = []; // collected here, laid out as non-overlapping hit zones after the stack is built
+
+    // first pass: raw proportional heights for each present category this month
+    const segs = [];
+    present.forEach(k=>{
+      const val = (monthlyObj[m].counts||{})[k]||0;
+      if(val<=0) return;
+      segs.push({k, val, h:(val/maxTotal)*plotH});
+    });
+    // redistribute height so no non-zero category drops below MIN_SEG_H, borrowing space from the
+    // larger categories — this keeps the bar's total height (and month-over-month comparison) unchanged,
+    // it only prevents a small-but-real category from shrinking into an invisible sliver
+    let deficit = 0, donors = 0;
+    segs.forEach(s=>{ if(s.h < MIN_SEG_H) deficit += (MIN_SEG_H - s.h); else donors += s.h; });
+    const shrink = (deficit > 0 && donors > 0) ? Math.max(0, (donors - deficit) / donors) : 1;
+    segs.forEach(s=>{ s.hAdj = (s.h < MIN_SEG_H) ? MIN_SEG_H : s.h * shrink; });
+
+    segs.forEach(({k, val, hAdj})=>{
+      y -= hAdj;
+      const neg = sentiment(k)==='neg';
+      const visH = Math.max(0, hAdj-1.5);
+      const tip = `'${monthLabel(m)} · ${esc(k)} '+${val}+'건'`;
+      if(neg){
+        // visible sliver is decorative only — a separate, non-overlapping hit-rect (laid out below) carries the interaction
+        bars += `<rect class="seg neg" x="${(cx-barW/2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${visH.toFixed(1)}" rx="3" fill="${SENT_COLOR[k]}"></rect>`;
+        negSegs.push({k, y, visH, tip});
+      } else {
+        bars += `<rect class="seg" x="${(cx-barW/2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${visH.toFixed(1)}" rx="3" fill="${SENT_COLOR[k]}"
+          onmousemove="moveTip(event)" onmouseenter="showTip(event,${tip})" onmouseleave="hideTip()"></rect>`;
+      }
+    });
+    if(negSegs.length){
+      // stack each negative category's hit zone edge-to-edge (never overlapping), centered on where the cluster visually sits
+      const clusterTop = Math.min(...negSegs.map(s=>s.y));
+      const clusterBottom = Math.max(...negSegs.map(s=>s.y+s.visH));
+      const totalH = negSegs.length * MIN_HIT_H;
+      let cursorY = Math.max(padT, (clusterTop+clusterBottom)/2 - totalH/2);
+      negSegs.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ // topmost-on-screen first
+        hits += `<rect class="seghit" x="${(cx-barW/2-3).toFixed(1)}" y="${cursorY.toFixed(1)}" width="${(barW+6).toFixed(1)}" height="${MIN_HIT_H.toFixed(1)}" rx="4" fill="transparent" pointer-events="all"
+          onmousemove="moveTip(event)" onmouseenter="showTip(event,${s.tip})" onmouseleave="hideTip()" onclick="showNegComments('${esc(spot)}',${m},'${esc(s.k)}')"></rect>`;
+        cursorY += MIN_HIT_H;
+      });
+    }
+    const monthTotal = (monthlyObj[m].total!=null) ? monthlyObj[m].total : present.reduce((a,k)=>a+((monthlyObj[m].counts||{})[k]||0),0);
+    const totalY = Math.max(13, y-6);
+    bars += `<text class="trendtotal" x="${cx}" y="${totalY.toFixed(1)}" text-anchor="middle">${monthTotal}건</text>`;
+    bars += `<text class="axislabel" x="${cx}" y="${H-7}" text-anchor="middle">${monthLabel(m)}</text>`;
+  });
+  const legend = present.map(k=>`<span class="li"><span class="sw" style="background:${SENT_COLOR[k]}"></span>${esc(k)}</span>`).join('');
+  return `
+  <div class="legend">${legend}</div>
+  <svg class="barsvg" viewBox="0 0 ${W} ${H}">
+    <line class="grid" x1="0" y1="${padT+plotH}" x2="${W}" y2="${padT+plotH}"></line>
+    ${bars}
+    ${hits}
+  </svg>
+  ${hasNeg ? `<div class="trendhint">💬 약간불만족·불만족·매우불만족 막대를 클릭하면 해당 월의 의견을 확인할 수 있어요</div>` : ''}
+  <div id="negPanel" class="negpanel" hidden></div>`;
+}
+
+function showNegComments(spot, month, cat){
+  const panel = document.getElementById('negPanel');
+  if(!panel) return;
+  const list = (NEGATIVE_COMMENTS[spot]||[]).filter(c => c.month===month && c.sat===cat);
+  const body = list.length===0
+    ? `<div class="schedule-note">해당 구간에 기록된 의견이 없습니다.</div>`
+    : list.map(c => `
+      <div class="negitem">
+        <div class="negitem-head">
+          <span class="negitem-person">${c.person ? esc(c.person) : '익명'}</span>
+          <span class="negitem-date">${monthLabel(c.month)} ${c.day}일</span>
+        </div>
+        <div class="negitem-text">${c.comment ? esc(c.comment).replace(/\n/g,'<br>') : '<span style="color:var(--muted);">작성된 의견 없음</span>'}</div>
+      </div>`).join('');
+  panel.innerHTML = `
+    <div class="negpanel-head">
+      <div class="negpanel-title">${esc(spot)} · ${monthLabel(month)} · ${esc(cat)} <span class="num negpanel-count">${list.length}건</span></div>
+      <button class="negpanel-close" onclick="document.getElementById('negPanel').hidden=true;">닫기 ✕</button>
+    </div>
+    <div class="negpanel-body">${body}</div>`;
+  panel.hidden = false;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function spotKPIrow(spot){
+  const d = MONITORING[spot];
+  let sumScore=0, scoredCount=0, pos=0,neu=0,neg=0;
+  Object.values(d.monthly).forEach(m=>{ sumScore+=m.sumScore; scoredCount+=m.scoredCount; const b=bucket(m.counts); pos+=b.pos;neu+=b.neu;neg+=b.neg; });
+  const avg = avg2(sumScore,scoredCount);
+  const ratio = (pos+neu+neg)>0? Math.round(pos/(pos+neu+neg)*100) : null;
+  return `
+  <div class="kpirow" style="margin-bottom:16px;">
+    <div class="kpi"><div class="klabel">총 응답</div><div class="kval num">${d.totalResponses}<small>건</small></div></div>
+    <div class="kpi"><div class="klabel">평균 만족도</div><div class="kval num">${avg?avg.toFixed(2):'—'}<small>/5</small></div></div>
+    <div class="kpi"><div class="klabel">긍정 비율</div><div class="kval num">${ratio!=null?ratio:'—'}<small>%</small></div></div>
+    <div class="kpi"><div class="klabel">응답 헬스키퍼/룸</div><div class="kval num">${Object.keys(d.byPerson||{}).length}<small>명</small></div></div>
+  </div>`;
+}
+
+function personSpark(monthlyObj){
+  const vals = MONTH_RANGE_ARR.map(m=> monthlyObj[m]? monthlyObj[m].total : 0);
+  const max = Math.max(1,...vals);
+  return `<div class="spark">${vals.map(v=>`<i style="height:${Math.max(2,v/max*24).toFixed(0)}px" title="${v}건"></i>`).join('')}</div>`;
+}
+
+function personTableHTML(spot){
+  const d = MONITORING[spot];
+  const people = Object.entries(d.byPerson||{});
+  if(people.length===0) return '<div class="schedule-note">이 스팟은 응답에 room/헬스키퍼 정보가 기재되지 않았습니다.</div>';
+  people.sort((a,b)=>b[1].total-a[1].total);
+  const rows = people.map(([name,pd])=>{
+    const b = bucket(pd.counts);
+    const ratio = (b.pos+b.neu+b.neg)>0? Math.round(b.pos/(b.pos+b.neu+b.neg)*100) : null;
+    const avg = avg2(pd.sumScore,pd.scoredCount);
+    return `<tr>
+      <td><strong>${esc(name)}</strong></td>
+      <td class="num">${pd.total}건</td>
+      <td class="num">${avg?avg.toFixed(2):'—'}</td>
+      <td><span class="ratiobar"><span style="width:${ratio||0}%"></span></span><span class="num">${ratio!=null?ratio+'%':'—'}</span></td>
+      <td>${personSpark(pd.monthly)}</td>
+    </tr>`;
+  }).join('');
+  return `
+  <div style="overflow-x:auto;">
+    <table class="datatable">
+      <thead><tr><th>Room / 헬스키퍼</th><th>총 응답</th><th>평균 만족도</th><th>긍정 비율</th><th>월별 추이(${MONTH_RANGE_LABEL})</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+let activeSpot = "페이";
+function spotPanelHTML(spot){
+  const d = MONITORING[spot];
+  if(!d || !d.totalResponses){
+    return `<div class="emptystate">
+      <div class="glyph">🌴</div>
+      <h3>${esc(spot)} — 접수된 응답 없음</h3>
+      <p>2026년 ${MONTH_RANGE_LABEL} 기준 해당 스팟 시트에 응답 데이터가 없습니다. 서비스 오픈/설문 배포 여부를 확인해 주세요.</p>
+    </div>`;
+  }
+  const personFilled = Object.values(d.byPerson||{}).reduce((a,p)=>a+p.total,0);
+  const caveat = (d.totalResponses>0 && personFilled/d.totalResponses < 0.3)
+    ? `<div class="callout"><span>💡</span><div><b>참고</b> — ${esc(spot)}은 ${d.totalResponses}건 응답 중 Room/헬스키퍼가 기재된 응답이 ${personFilled}건뿐이라 인원별 통계는 참고용입니다. 스팟 전체 통계를 우선 확인하세요.</div></div>`
+    : '';
+  return `
+    ${spotKPIrow(spot)}
+    <div class="chart-card">
+      <h3>만족도 구성</h3>
+      <div class="sub">${MONTH_RANGE_LABEL} 누적 응답 기준</div>
+      ${satisfactionDonut(d.monthly)}
+    </div>
+    <div class="chart-card" style="margin-top:14px;">
+      <h3>월별 응답 추이</h3>
+      <div class="sub">매우만족–약간만족–보통–약간불만족–매우불만족 구성</div>
+      ${monthlyTrendMini(spot, d.monthly)}
+    </div>
+    <div class="chart-card" style="margin-top:14px;">
+      <h3>Room / 헬스키퍼별 통계</h3>
+      <div class="sub">월별 만족도 개수 · 평균 · 긍정비율</div>
+      ${personTableHTML(spot)}
+      ${caveat}
+    </div>
+  `;
+}
+
+function renderSpotSwitcher(){
+  return `<div class="spotpills">
+    ${SPOT_ORDER.map(spot=>{
+      const total = (MONITORING[spot]&&MONITORING[spot].totalResponses)||0;
+      return `<button class="spotpill ${activeSpot===spot?'active':''}" onclick="activeSpot='${esc(spot)}'; rerenderSpotPanel();">
+        <span class="dot" style="background:var(${SPOT_COLOR_VAR[spot]})"></span>${esc(spot)} <span class="count">${total}건</span>
+      </button>`;
+    }).join('')}
+  </div>`;
+}
+
+function rerenderSpotPanel(){
+  document.querySelectorAll('.spotpill').forEach(b=>b.classList.remove('active'));
+  const idx = SPOT_ORDER.indexOf(activeSpot);
+  document.querySelectorAll('.spotpill')[idx].classList.add('active');
+  document.getElementById('spotPanel').innerHTML = spotPanelHTML(activeSpot);
+}
+
+function renderMonitorSpotSection(){
+  return `
+  <section class="block">
+    <div class="block-head">
+      <h2>스팟별 상세</h2>
+      <div class="desc">스팟을 선택해 월별 추이와 인원별 통계를 확인하세요</div>
+    </div>
+    ${renderSpotSwitcher()}
+    <div id="spotPanel">${spotPanelHTML(activeSpot)}</div>
+  </section>`;
+}
+
+function renderMonitorView(){
+  document.getElementById('view-monitor').innerHTML =
+    renderMonitorOverview() + spotComparisonHTML() + renderMonitorSpotSection();
+}
+
+/* ---------- tabs ---------- */
+document.getElementById('tabbtn-people').addEventListener('click', ()=>{
+  document.getElementById('tabbtn-people').classList.add('active');
+  document.getElementById('tabbtn-monitor').classList.remove('active');
+  document.getElementById('view-people').classList.add('active');
+  document.getElementById('view-monitor').classList.remove('active');
+});
+document.getElementById('tabbtn-monitor').addEventListener('click', ()=>{
+  document.getElementById('tabbtn-monitor').classList.add('active');
+  document.getElementById('tabbtn-people').classList.remove('active');
+  document.getElementById('view-monitor').classList.add('active');
+  document.getElementById('view-people').classList.remove('active');
+});
+
+renderPeopleView();
+renderMonitorView();
+
+/* ---------- last-updated note ---------- */
+const BUILD_DATE = '2026-09-15';
+(function(){
+  const el = document.getElementById('lastUpdatedNote');
+  if(el) el.textContent = `이 게시본 데이터 취합 시각: ${BUILD_DATE} · 원본 시트가 바뀌면 다시 취합을 요청해 주세요`;
+  const rangeEl = document.getElementById('dataRangeNote');
+  if(rangeEl) rangeEl.textContent = `2026.01–2026.${String(MAX_MONTH).padStart(2,'0')}`;
+})();
+
+/* ---------- theme toggle (light / dark / system) ---------- */
+(function(){
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggleBtn');
+  if(!btn) return;
+  function systemPrefersDark(){
+    try{ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }catch(e){ return false; }
+  }
+  function getStored(){ try{ return localStorage.getItem('hc-theme'); }catch(e){ return null; } }
+  function setStored(v){ try{ localStorage.setItem('hc-theme', v); }catch(e){} }
+  function apply(theme){
+    if(theme==='dark'){ root.setAttribute('data-theme','dark'); btn.textContent='☀️'; }
+    else if(theme==='light'){ root.setAttribute('data-theme','light'); btn.textContent='🌙'; }
+    else{ root.removeAttribute('data-theme'); btn.textContent = systemPrefersDark() ? '☀️' : '🌙'; }
+  }
+  let current = getStored() || 'system';
+  apply(current);
+  btn.addEventListener('click', function(){
+    const isDarkNow = current==='dark' || (current==='system' && systemPrefersDark());
+    current = isDarkNow ? 'light' : 'dark';
+    setStored(current);
+    apply(current);
+  });
+})();
+
+/* ---------- refresh button: reloads to pick up the latest published version of this page ---------- */
+(function(){
+  const btn = document.getElementById('refreshBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    btn.classList.add('spin');
+    btn.disabled = true;
+    setTimeout(()=>{ location.reload(); }, 220);
+  });
+})();
+</script>
